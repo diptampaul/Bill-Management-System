@@ -19,22 +19,26 @@ def get_bills(group_id):
             total_paid_list[m_username] = bill.amount
         else:
             total_paid_list[m_username] = total_paid_list[m_username] + bill.amount
-    due_list = {}
+    due_list = []
     for member in Group_Members.objects.filter(gid = group_id):
-        due_list[member.m_name] = 0
+        due_list.append([member.mid,member.m_name, member.wallet_balance, 0])
     for k,v in total_paid_list.items():
-        shared_amount = v/len(due_list)
-        for k1, v1 in due_list.items():
-            if k != k1:
-                due_list[k1] = due_list[k1] + shared_amount 
+        shared_amount = (v/len(due_list))
+        for item in due_list:
+            if k != item[1]:
+                item[3] = item[3] + float(shared_amount)
     #Getting the completed bills
     completed_bills = []
     for bill in Bill.objects.filter(status='C').filter(gid = group_id):
         #Corresponding name of mid
         m_username = Group_Members.objects.get(mid = bill.mid).m_name
         completed_bills.append({'file': str(bill.photo).split("bills/")[-1], 'billed_for': bill.billed_for, 'amount': bill.amount, 'upvote': bill.upvote, 'created_at': bill.created, 'id': bill.bid, 'm_user': m_username})
+    
+    modified_due_list = []
+    for member in due_list:
+        modified_due_list.append({'name': member[1], 'amount': round(member[3],2), 'id' : member[0], 'wallet': member[2]})
         
-    return pending_bills, approved_bills, due_list, completed_bills
+    return pending_bills, approved_bills, modified_due_list, completed_bills
 
 def update_upvotes(bid):
     bill_obj = Bill.objects.get(bid = bid)

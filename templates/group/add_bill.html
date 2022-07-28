@@ -1,0 +1,43 @@
+{% extends '../home.html' %}
+{%load static%}
+{%block content%}
+
+<div class="box box-1">
+    <div class="heading">
+        <h2>Hi {{g_name}} !!</h2>
+        <br>
+        <h4>  </h4>
+        <p></p>
+    </div>
+    <button class="talk" style='cursor: None'>
+        NEW BILL ADDITION
+    </button>
+    <br><br><br>
+    <div class="form">
+        {%if INVALID%}
+        <h4>Oops !! PLEASE ENTER VALID DATA</h4><br><br>
+        {%endif%}
+        {%if WUSER%}
+        <h4>Oops !! You dont have enough wallet Balance. Please RELOAD the WALLET</h4><br><br>
+        {%endif%}
+        <form action={% url 'bill_added' %} method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" id="g_det" name="g_det" value="{{g_name}}" style="display: None;">
+            <input type="password" id="g_password" name="g_password" value="{{g_password}}" style="display: None;">
+            <label for="upload">Upload BILL (PDF/Jpeg/PNG) </label>
+            <input type="file" id="upload" name="upload" required><br><br>
+            <label for="amount">Bill Amount </label>
+            <input type="text" id="amount" name="amount" required><br><br>
+            <label for="billed_for">Billed For </label>
+            <input type="text" id="billed_for" name="billed_for" required><br><br>
+            <label for="billed_by">Billed By </label>
+            <select id="billed_by" name="billed_by">
+                {%for member in member_details%}
+                    <option value="{{member.id}}">{{member.name}} [Remaining Balance : {{member.wallet}}]</option>
+                {%endfor%}
+            </select><br><br>
+            <input type="submit" name="submit" class='submit' value='Submit'>
+        </form>
+    </div>
+</div>
+{%endblock%}

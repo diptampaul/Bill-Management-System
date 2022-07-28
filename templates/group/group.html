@@ -11,10 +11,10 @@
     <br><br><br>
 
 {% if member_added %}
-<div class="member-added" style="position: absolute; top: 1.5%; left: 5%;">
+<div class="member-added" style="position: absolute; top: 12%; left: 5%;">
     <h2>New Member Added Successfully</h2>
 </div>
-{%else%}
+{%endif%}
 <div class="create-member" style="position: absolute; top: 1.5%; left: 5%;">
     <form action={% url 'add_member' %} method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -24,7 +24,16 @@
         <input type="submit" name="submit" class='submit' value='ADD NEW MEMBER' style="width: 200px !important;">
     </form>
 </div>
-{%endif%}
+
+<div class="create-member" style="position: absolute; top: 20%; left: 5%;">
+    <form action={% url 'add_bill_home' %} method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="text" id="g_det" name="g_det" value="{{g_name}}" style="display: None;">
+        <input type="password" id="g_password" name="g_password" value="{{g_password}}" style="display: None;">
+        <input type="submit" name="submit" class='submit' value='ADD NEW BILL' style="width: 200px !important;">
+    </form>
+</div>
+
 
 {%if pending_bills|length%}
 <h1>Pending Bills (Upvote Bill to get approved)</h1><br>
@@ -105,11 +114,14 @@
     <tr>
       <th> NAME </th>
       <th> TOTAL PENDING </th>
+      <th> WALLET BALANCE </th>
+      <th> TOPUP WALLET </th>
     </tr>
-    {%for key, value in dues.items %}
+    {%for due in dues%}
     <tr>
-        <td>{{key}}</td>
-        <td>{{value}}</td>
+        <td>{{due.name}}</td>
+        <td>{{due.amount}}</td>
+        <td>{{due.wallet}}</td>
     </tr>
     {%endfor%}
   </table><br>
@@ -119,7 +131,7 @@
 {%endif%}
 
 {%if completed_bills|length%}
-<h1>Pending Bills (Upvote Bill to get approved)</h1><br>
+<h1>Completed Bills</h1><br>
 <table class="details completed">
     <tr>
       <th> ID </th>

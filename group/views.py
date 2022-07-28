@@ -29,7 +29,7 @@ def bill_upvote(request):
     if request.method == 'POST':
         g_det = request.POST['g_det']
         g_password = request.POST['g_password']
-        bill_ids =  request.POST.getlist('billids')            #To fetch list of values from checklist
+        bill_ids =  request.POST.getlist('billids') #To fetch list of values from checklist
          #Checking the group id and password
         group_details = Group_Details.objects.all()
         for gd in group_details:
@@ -87,10 +87,12 @@ def bill_added(request):
                     #Check if the billed amount / total member is less than the billed by wallet amount
                     try:
                         if float(amount) > Group_Members.objects.get(mid = billed_by).wallet_balance:
-                            member_details = []
-                            for member in Group_Members.objects.filter(gid = gd.gid):
-                                member_details.append({'id': member.mid, 'name': member.m_name, 'wallet': member.wallet_balance})
-                            return render(request, 'group/add_bill.html', {'g_name': g_det, 'g_password': g_password, 'member_details': member_details, 'WUSER': True})
+                            pass
+                            #Wallet condition is not applicable as of now as we will check it before approving any bill
+                            # member_details = []
+                            # for member in Group_Members.objects.filter(gid = gd.gid):
+                            #     member_details.append({'id': member.mid, 'name': member.m_name, 'wallet': member.wallet_balance})
+                            # return render(request, 'group/add_bill.html', {'g_name': g_det, 'g_password': g_password, 'member_details': member_details, 'WUSER': True})
                     except:
                         member_details = []
                         for member in Group_Members.objects.filter(gid = gd.gid):

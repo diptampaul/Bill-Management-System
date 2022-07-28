@@ -6,7 +6,7 @@ class Bill(models.Model):
     bid = models.IntegerField(primary_key=True)
     billed_for = models.CharField(max_length=400)
     amount = models.FloatField()
-    status = models.CharField(max_length=2)  #p or a (pending or approve)
+    status = models.CharField(max_length=2)  #p or a or c (pending or approve or completed)
     upvote =  models.IntegerField()
     created = models.DateTimeField(auto_now_add=True)
     gid = models.IntegerField()

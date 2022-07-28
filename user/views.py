@@ -34,8 +34,8 @@ def add_member(request):
                     group_member.m_name = m_name
                     group_member.save()
                     
-                    pending_bills, approved_bills, dues = get_bills(str(gd.gid))
-                    return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'member_added': True, 'dues': dues})
+                    pending_bills, approved_bills, dues, completed_bills = get_bills(str(gd.gid))
+                    return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'member_added': True, 'dues': dues, 'completed_bills': completed_bills})
         return render(request, 'index.html', {"INVALID": True})
     else:
         return render(request, 'index.html', {})

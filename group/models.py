@@ -13,3 +13,4 @@ class Group_Members(models.Model):
     mid = models.IntegerField(primary_key=True)   #Groupid + Member Number    #And also check if mid can never be greater than gid
     gid = models.IntegerField(default=0)
     m_name = models.CharField(max_length=200)
+    wallet_balance = models.FloatField(default=0)

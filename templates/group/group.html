@@ -72,7 +72,7 @@
 
 {%if approved_bills|length%}
 <br><br><br><h1>Approved Bills</h1><br>
-<table class="details pending">
+<table class="details approved">
     <tr>
       <th> ID </th>
       <th> FILE </th>
@@ -80,6 +80,7 @@
       <th> AMOUNT </th>
       <th> PAID BY </th>
       <th> CREATED AT </th>
+      <th> AMOUNT </th>
     </tr>
     {%for bill in approved_bills%}
     <tr>
@@ -94,13 +95,13 @@
     {%endfor%}
   </table><br>
 {%else%}
-<h1>Pending Bills </h1><br>
+<h1>Approved Bills </h1><br>
 <h3>---- All Cleared | Enjoy !!! ----</h3>
 {%endif%}
 
 {%if dues|length%}
 <br><br><br><h1>Individual Dues</h1><br>
-<table class="details pending">
+<table class="details dues">
     <tr>
       <th> NAME </th>
       <th> TOTAL PENDING </th>
@@ -113,9 +114,35 @@
     {%endfor%}
   </table><br>
 {%else%}
-<h1>Pending Bills </h1><br>
+<h1>Individual Dues </h1><br>
 <h3>---- All Cleared | Enjoy !!! ----</h3>
 {%endif%}
 
-<br><br><br><h1>Completed Bills</h1><br>
+{%if completed_bills|length%}
+<h1>Pending Bills (Upvote Bill to get approved)</h1><br>
+<table class="details completed">
+    <tr>
+      <th> ID </th>
+      <th> FILE </th>
+      <th> BILLED FOR </th>
+      <th> AMOUNT </th>
+      <th> PAID BY </th>
+      <th> CREATED AT </th>
+    </tr>
+    {%for bill in completed_bills%}
+    <tr>
+        <td>{{bill.id}}</td>
+        <td><a href="{% url 'bills_download' filename=bill.file %}" style="color: lightblue;" onMouseOver="this.style.color='black'"
+            onMouseOut="this.style.color='lightblue'">Download File</a></td>
+        <td>{{bill.billed_for}}</td>
+        <td>{{bill.amount}}</td>
+        <td>{{bill.m_user}}</td>
+        <td>{{bill.created_at}}</td>
+    </tr>
+    {%endfor%}
+  </table>
+{%else%}
+<h1>Completed Bills </h1><br>
+<h3>---- Empty ----</h3>
+{%endif%}
 {%endblock%}

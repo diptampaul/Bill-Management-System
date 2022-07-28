@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+<body>
+    <form action="register" method="POST">
+        {% csrf_token %}
+        <input type="text" name="first_name" placeholder="First Name">
+        <input type="text" name="username" placeholder="User Name">
+        <input type="email" name="email" placeholder="Email id">
+        <input type="password" name="password" placeholder="Password">
+        <input type="password" name="password2" placeholder="Confirm password">
+        <input type="submit" name="submit">
+    </form>
+
+    <div class="error">
+        <h3>
+            <!--Print the last message coming from messages error list-->
+
+            {% for message in messages %}
+            {{message}}
+            {%endfor%}
+        </h3>
+    </div>
+</body>
+</html>

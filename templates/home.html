@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing | DIPTAM PAUL</title>
+    {%block title%}{%endblock%}
+    <link rel="shortcut icon" href="{% static 'Logo.png' %}" type="image/png"> 
+    <link rel="icon" type="image/png" href="{% static 'Logo.png' %}"> 
+    <link rel="stylesheet" href="{% static 'style.css' %}" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        .mobile{
+            display: none;
+        }
+
+        .desktop {
+            display: block;
+        }
+
+        @media screen and (max-width: 800px) {
+            .desktop {
+                display: none;
+            }
+
+            .mobile {
+                display: block;
+            }
+        }
+    </style>
+    {%block css%}{%endblock%}
+</head>
+<body>
+    <div class="container desktop">
+        {%block content%}{%endblock%}
+        {% comment %} <div class="box box-1">
+            <div class="heading">
+                <h2>HUL DAILY TASKS</h2>
+                <br>
+                {%if error%}
+                <h4 style='color:red'> INVALID DATA FORMAT </h4>
+                {%else%}
+                <h4> Addverb Technologies Pvt Ltd </h4>
+                {%endif%}
+                <p></p>
+            </div>
+            <button class="talk">
+                By CBU Batchs
+            </button>
+            <button class="group">
+                Upload Logs 
+            </button>
+            <br><br><br>
+            <div class="form">
+                <p>Enter same number of CBU and Batches separated by spaces</p>
+                <form action={% url 'task_release_data_confirm' %} method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <label for="cbu">Enter CBUs </label><br><br>
+                    <input type="text" id="cbu" name="cbu" required><br><br>
+                    <label for="batch">Enter BATCHs </label><br><br>
+                    <input type="text" id="batch" name="batch" required><br><br>
+                    <label for="basepack">Enter BASEPACKs </label><br><br>
+                    <input type="text" id="basepack" name="basepack" required><br><br>
+                    <input type="submit" name="submit" class='submit' value='Submit'>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="box box-2">
+            <div class="heading">
+                <h2>HUL DAILY TASKS</h2>
+                <br>
+                <h4> Addverb Technologies Pvt Ltd </h4>
+                <p></p>
+            </div>
+            <button class="talk group-close">
+                By CBU Batchs
+            </button>
+            <button class="group-close" style="margin-bottom: 100px;">
+                Upload Logs
+            </button>
+
+            <div class="form">
+                <form action={% url 'logs_upload' %} method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <label for="logscount">Enter Total Number of logs file to be uploaded </label><br><br>
+                    <input type="text" id="logscount" name="logscount" required><br><br>
+                    <input type="submit" name="submit" class='submit' value='Submit'>
+                </form>
+            </div>
+        </div> {% endcomment %}
+
+    </div>
+
+    <div class="container mobile">
+        <br><br><br><br>
+        <h1>Please Open it in Desktop Mode</h1>
+        <h2>This Webpage is not Responsive</h2>
+    </div>
+
+
+
+
+    <script>
+        //answers
+//const greetings = ['Hello Mate', 'How are you doing today?', "What's Up homeboi"]
+
+
+//dom
+const btn = document.querySelector('.talk');
+const group = document.querySelector('.group')
+const group_cls = document.querySelector('.group-close')
+const main_content = document.querySelector('.box-1')
+const group_content = document.querySelector('.box-2')
+const submit_btn = document.querySelector('.submit')
+
+
+
+
+
+group.addEventListener('click',function(e){
+    main_content.style.display = 'None';
+    group_content.style.display = 'block';
+})
+
+group_cls.addEventListener('click',function(e){
+    main_content.style.display = 'block';
+    group_content.style.display = 'none';
+})
+    </script>
+
+    {%block script%}{%endblock%}
+</body>
+</html>

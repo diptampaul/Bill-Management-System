@@ -1,0 +1,153 @@
+*{
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    text-emphasis: none;
+}
+
+body{
+    text-align: center;
+    transition: all 1.5s ease;
+}
+
+.container{
+    height: 100vh;
+
+}
+
+.box{
+    margin: auto;
+    width: 800px;
+    height: 80vh;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 0.3px solid rgb(82, 82, 82);
+    box-shadow: 3px 3px 5px 6px #ccc;
+    background-color: #eee;
+}
+
+
+button,
+.talk,
+.group,
+.group-close,
+.submit{
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 3px 3px 5px 6px #ccc;
+    font-size: 15px;
+    cursor: pointer;
+}
+.submit{
+    width: 120px !important;
+}
+
+.talk, .group, .group-close{
+    width: 280px !important;
+}
+
+.heading{
+    margin: 15px auto;
+    color: rgb(66, 66, 66);
+}
+
+.heading p{
+    margin: auto;
+    height: 20px;
+    width: 50%;
+    text-align: center;
+    border-bottom: 1px dashed rgb(46, 46, 46);
+}
+
+.heading h2{
+    font-size: 54px;
+}
+
+.talk,
+.group,
+.group-close{
+    width: 150px;
+    margin: 25px 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.group,
+.group-close{
+    margin-left: 40px;
+}
+
+button.active{
+    font-weight: 600;
+    cursor: no-drop;
+    pointer-events: none;
+}
+
+
+
+.gp-contents{
+    margin: 20px 0;
+    font-size: 20px;
+}
+
+.box-2{
+    display: none;
+}
+
+.submit{
+    width: 100px;
+    margin: 20px 0;
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+.details {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table, th, td {
+    border: 1px solid black;
+  }
+  th{
+      width: 130px;
+  }
+
+
+/* Split the screen in half */
+.split {
+    height: 100%;
+    width: 50%;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    overflow-x: hidden;
+    padding-top: 20px;
+  }
+  
+  /* Control the left side */
+  .left {
+    left: 0;
+    background-color: rgb(243, 237, 237);
+  }
+  
+  /* Control the right side */
+  .right {
+    right: 0;
+    background-color: rgb(255, 242, 242);
+  }
+  
+  /* If you want the content centered horizontally and vertically */
+  .centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  

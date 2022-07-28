@@ -1,0 +1,61 @@
+{% extends 'home.html' %}
+{%load static%}
+
+{%block content%}
+
+<div class="box box-1">
+    <div class="heading">
+        <h2>Barracudas of Lotus Zing</h2>
+        <br>
+        <h4>  </h4>
+        <p></p>
+    </div>
+    <button class="talk">
+        GROUP
+    </button>
+    <button class="group">
+        CREATE GROUP 
+    </button>
+    <br><br><br>
+    <div class="form">
+        {%if INVALID%}
+        <h4>INVALID GROUP NAME OR PASSWORD</h4><br><br>
+        {%endif%}
+        <form action={% url 'group' %} method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="g_det">Enter Group Name OR ID </label>
+            <input type="text" id="g_det" name="g_det" required><br><br>
+            <label for="g_password">Enter Group Password </label>
+            <input type="password" id="g_password" name="g_password" required><br><br>
+            <input type="submit" name="submit" class='submit' value='Submit'>
+        </form>
+    </div>
+
+</div>
+
+<div class="box box-2">
+    <div class="heading">
+        <h2>Barracudas of Lotus Zing</h2>
+        <br>
+        <p></p>
+    </div>
+    <button class="talk group-close">
+        GROUP
+    </button>
+    <button class="group-close" style="margin-bottom: 100px;">
+        CREATE GROUP 
+    </button>
+
+    <div class="form">
+        <!--<form action={% url 'home' %} method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="logscount">Enter Total Number of logs file to be uploaded </label><br><br>
+            <input type="text" id="logscount" name="logscount" required><br><br>
+            <input type="submit" name="submit" class='submit' value='Submit'>
+        </form>-->
+        <h1>CREATION DASHBOARD IS NOT READY YET</h1>
+    </div>
+</div> 
+
+
+{%endblock%}

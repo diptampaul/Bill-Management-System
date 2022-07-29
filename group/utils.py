@@ -51,7 +51,7 @@ def convert_pending_to_approve(group_id):
         if bill.upvote >= threshold:
             bill.status = 'A'
             #Reduce the shared amount from the user wallet
-            member_obj = Group_Members.objects.get(mid = bill.mid)
-            member_obj.wallet_balance = float(member_obj.wallet_balance) - round((bill.amount / len(Group_Members.objects.filter(gid = group_id))),2)
-            member_obj.save()
+            # member_obj = Group_Members.objects.get(mid = bill.mid)
+            # member_obj.wallet_balance = float(member_obj.wallet_balance) - round((bill.amount / len(Group_Members.objects.filter(gid = group_id))),2)
+            # member_obj.save()
             bill.save()

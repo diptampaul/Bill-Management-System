@@ -79,8 +79,30 @@
 <h3>---- Empty ----</h3>
 {%endif%}
 
+
+
+
 {%if approved_bills|length%}
 <br><br><br><h1>Approved Bills</h1><br>
+{%if insufficent_balance_members%}
+<div id = "ins-balance" style="display: block">
+    <h3>INSUFFCIENT BALANCE FOR THE FOLLOWING MEMBERS</h3><br>
+    <table class="details dues">
+        <tr>
+        <th> NAME </th>
+        <th> NEED TO TOPUP </th>
+        </tr>
+        {%for ibmember in insufficent_balance_members%}
+        <tr>
+            <td>{{ibmember.name}}</td>
+            <td>{{ibmember.need_to_load}}</td>
+        </tr>
+        {%endfor%}
+    </table><br><br>
+</div>
+{%endif%}
+<form action={% url 'bill_clear' %} method="post" enctype="multipart/form-data">
+    {% csrf_token %}
 <table class="details approved">
     <tr>
       <th> ID </th>
@@ -89,7 +111,7 @@
       <th> AMOUNT </th>
       <th> PAID BY </th>
       <th> CREATED AT </th>
-      <th> AMOUNT </th>
+      <th> CLEAR BILL</th>
     </tr>
     {%for bill in approved_bills%}
     <tr>
@@ -100,13 +122,29 @@
         <td>{{bill.amount}}</td>
         <td>{{bill.m_user}}</td>
         <td>{{bill.created_at}}</td>
+        <td>
+            <div>
+                <input type="radio" id="billids" name="billids" value="{{bill.id}}">
+                <label for="billids"> CLEAR</label><br>
+            </div>
+        </td>
     </tr>
     {%endfor%}
-  </table><br>
+  </table>
+  <input type="text" id="g_det" name="g_det" value="{{g_name}}" style="display: None;">
+  <input type="password" id="g_password" name="g_password" value="{{g_password}}" style="display: None;">
+  <input type="submit" name="submit" class='submit' value='submit' >
+</form><br>
 {%else%}
 <h1>Approved Bills </h1><br>
 <h3>---- All Cleared | Enjoy !!! ----</h3>
 {%endif%}
+
+
+
+
+
+
 
 {%if dues|length%}
 <br><br><br><h1>Individual Dues</h1><br>
@@ -130,11 +168,14 @@
 <h3>---- All Cleared | Enjoy !!! ----</h3>
 {%endif%}
 
+
+
+
+
 {%if completed_bills|length%}
 <h1>Completed Bills</h1><br>
 <table class="details completed">
     <tr>
-      <th> ID </th>
       <th> FILE </th>
       <th> BILLED FOR </th>
       <th> AMOUNT </th>
@@ -143,7 +184,6 @@
     </tr>
     {%for bill in completed_bills%}
     <tr>
-        <td>{{bill.id}}</td>
         <td><a href="{% url 'bills_download' filename=bill.file %}" style="color: lightblue;" onMouseOver="this.style.color='black'"
             onMouseOut="this.style.color='lightblue'">Download File</a></td>
         <td>{{bill.billed_for}}</td>
@@ -157,4 +197,15 @@
 <h1>Completed Bills </h1><br>
 <h3>---- Empty ----</h3>
 {%endif%}
+<br><br><br>
+{%endblock%}
+{%block script%}
+<script>
+setTimeout(() => {
+    const box = document.getElementById('ins-balance');
+    // 👇️ removes element from DOM
+    box.style.display = 'none';
+  }, 25000); // 👈️ time in milliseconds
+</script>
+  
 {%endblock%}

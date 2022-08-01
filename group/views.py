@@ -6,7 +6,7 @@ import mimetypes
 import os
 from django.http.response import HttpResponse
 
-#REMAINING then move/send the billed amount to the paid user account, add each member/group ewallet, add clear from wallet in the individual due section, add wallet balance to individual members, 
+#REMAINING then move/send the billed amount to the paid user account, update the payment send notification in group.html, check if the billed memeber added his/her account number or not before clearing the bill, clear multiple bills together, add/edit payment preferences, add each member/group ewallet, add clear from wallet in the individual due section, add wallet balance to individual members, 
 
 # Create your views here.
 def group(request):
@@ -129,6 +129,8 @@ def bill_clear(request):
                     bill_ids =  request.POST.getlist('billids') 
                     for bill_id in bill_ids:
                         bill_obj = Bill.objects.get(bid = bill_id)
+                        #Check if the billed member added his wallet details or not, otherwise money couldn't be transferred hence throw error
+                        
                         #Check if shared amount is present everyone's wallet, else return cannot be cleared.
                         all_members = Group_Members.objects.filter(gid = gd.gid)
                         insufficent_balance_members = []
@@ -146,9 +148,11 @@ def bill_clear(request):
                                     member.wallet_balance = member.wallet_balance - round((bill_obj.amount / len(all_members)),2)
                                     member.save()
                             bill_obj.status = 'C'
-                            bill_obj.save()                        
+                            bill_obj.save() 
+                            #Send mail to Diptam to transferred the required amount to the billed member  
+                                                 
                             pending_bills, approved_bills, dues, completed_bills = get_bills(str(gd.gid))
-                            return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'dues': dues, 'completed_bills': completed_bills, 'insufficent_balance_members': insufficent_balance_members})
+                            return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'dues': dues, 'completed_bills': completed_bills, 'money_send': True})
         return render(request, 'index.html', {"INVALID": True})
     else:
         return render(request, 'index.html', {})

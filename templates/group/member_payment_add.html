@@ -1,0 +1,165 @@
+{% extends '../home.html' %}
+{%load static%}
+
+{%block content%}
+
+<h1> Hi {{g_name}} !!</h1> 
+<form action={% url 'home' %} method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="submit" name="submit" class='submit' value='HOME' >
+</form><br>
+
+<form action={% url 'group' %} method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="text" id="g_det" name="g_det" value="{{g_name}}" style="display: None;">
+    <input type="password" id="g_password" name="g_password" value="{{g_password}}" style="display: None;">
+    <input type="submit" name="submit" class='submit' value='BACK TO BILLS' style="width: 150px !important">
+</form><br>
+<br><br><br>
+
+
+<h1> PAYOUT DETAILS OF EACH MEMBERS </h1><br>
+<table class="details dues">
+    <tr>
+      <th> NAME </th>
+      <th> CURRENT WALLET BALANCE </th>
+      <th> PAYOUT MODE </th>
+      <th> PAYOUT DETAILS  </th>
+    </tr>
+    {%for member in member_details%}
+    <tr>
+        <td>{{member.name}}</td>
+        {%if member.payment_added %}
+        <td>{{member.wallet}}</td>
+        <td>{{member.payment_mode}}</td>
+        <td>
+            {% for row in member.payment_details%}
+                {{row}}<br>
+            {% endfor %}
+        </td>
+        {%else%}
+        <td>{{member.wallet}}</td>
+        <td>NONE</td>
+        <td>
+            NONE
+        </td>
+        {%endif%}
+    </tr>
+    {%endfor%}
+  </table><br>
+
+
+<hr><br><br>
+<h1> ADD/UPDATE EXHISTING PAYOUT DETAILS </h1><br>
+
+{%if wrong_input%}
+<h3 style="color:red;">Some fields are missing. Please Retry. </h3><br><br>
+{%endif%}
+
+{%if wrong_payment_mode%}
+<h3 style="color:red;">Some fields are missing. Please Retry. </h3><br><br>
+{%endif%}
+
+{%if wrong_format%}
+    <h3 style="color:red;">Some fields formatting is wrong. Please Rewrite </h3>
+    {%for wrong_field in wrong_fields%}
+        {%if wrong_field.field == 'upi'%}
+        UPI ID : {{wrong_field.value}} FORMAT IS WRONG AND INVALID
+        {%else%}
+        ACCOUNT NUMBER : {{wrong_field.value}} MUST BE NUMBERS
+        {%endif%}
+    {%endfor%}
+    <br><br>
+{%endif%}
+
+<form action={% url 'add_successful_payment' %} method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+<table class="details dues">
+    <tr>
+      <th> NAME </th>
+      <th> PREFERRED PAYOUT MODE </th>
+      <th style="width: 450px !important"> BANK DETAILS  </th>
+      <th style="width: 450px !important"> WALLET DETAILS  </th>
+      <th style="width: 450px !important"> UPI DETAILS  </th>
+    </tr>
+    {%for member in member_details%}
+    <tr>
+        <td>{{member.name}}</td>
+        <td>
+            <div>
+                <select id="payment_mode" class="payment_mode" name="payment_mode">
+                    <option value="N">Don't Update</option>
+                    <option value="U">UPI Transfer</option>
+                    <option value="B">Bank Transfer</option>
+                    <option value="W">Paytm/GPay Wallet</option>
+                </select>
+            </div>
+        </td>
+        
+        <td style="width: 450px !important">
+            <div id='B' class='B'>
+                <label for="account_number">Bank Account Number : </label>
+                <input type="text" id="account_number" name="account_number"><br><br>
+                <label for="ifsc">Bank Account IFSC Code : </label>
+                <input type="text" id="ifsc" name="ifsc"><br><br>
+                <label for="holder_name">Bank Account Holder Name : </label>
+                <input type="text" id="holder_name" name="holder_name"><br>
+            </div>
+        </td>
+        <td style="width: 450px !important">
+            <div id='W' class='W'>
+                <label for="wallet_no">Mobile/Wallet Number : </label>
+                <input type="text" id="wallet_no" name="wallet_no"><br><br>
+                <label for="wallet_type">Wallet Type : </label>
+                <select id="wallet_type" name="wallet_type">
+                    <option value="P">Paytm Pay</option>
+                    <option value="G">Google Pay</option>
+                </select><br>
+            </div>
+        </td>
+        <td style="width: 450px !important">
+            <div id='U' class='U'>
+                <label for="upi">UPI ID : </label>
+                <input type="text" id="upi" name="upi"><br>
+            </div>
+        </td>
+        <input type="text" id="member_id" name="member_id" value="{{member.id}}" style="display: None;">
+    </tr>
+    {%endfor%}
+  </table>
+  <input type="text" id="g_det" name="g_det" value="{{g_name}}" style="display: None;">
+  <input type="password" id="g_password" name="g_password" value="{{g_password}}" style="display: None;">
+  <input type="submit" name="submit" class='submit' value='submit' >
+</form><br>
+
+{%endblock%}
+
+{%block script%}
+<script>
+    const el = document.getElementById('payment_mode');
+    const member_payment_modes = document.querySelectorAll('.payment_mode');
+
+
+    {% comment %} const bank = document.getElementById('B');
+    const wallet = document.getElementById('W');
+    const upi = document.getElementById('U');
+    
+    el.addEventListener('change', function handleChange(event) {
+        console.log(event.target.value)
+      if (event.target.value === 'B') {
+        bank.style.display = 'block';
+        wallet.style.display = 'none';
+        upi.style.display = 'none';
+      } else if (event.target.value === 'W') {
+        bank.style.display = 'none';
+        wallet.style.display = 'block';
+        upi.style.display = 'none';
+      } else{
+        bank.style.display = 'none';
+        wallet.style.display = 'none';
+        upi.style.display = 'block';
+      }
+    });     {% endcomment %}
+</script>
+  
+{%endblock%}

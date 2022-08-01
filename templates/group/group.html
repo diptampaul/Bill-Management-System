@@ -34,6 +34,15 @@
     </form>
 </div>
 
+<div class="create-member" style="position: absolute; top: 27%; left: 5%;">
+    <form action={% url 'add_payment' %} method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="text" id="g_det" name="g_det" value="{{g_name}}" style="display: None;">
+        <input type="password" id="g_password" name="g_password" value="{{g_password}}" style="display: None;">
+        <input type="submit" name="submit" class='submit' value='ADD PAYOUT DETAILS' style="width: 200px !important;">
+    </form>
+</div>
+
 
 {%if pending_bills|length%}
 <h1>Pending Bills (Upvote Bill to get approved)</h1><br>
@@ -84,6 +93,7 @@
 
 {%if approved_bills|length%}
 <br><br><br><h1>Approved Bills</h1><br>
+
 {%if insufficent_balance_members%}
 <div id = "ins-balance" style="display: block">
     <h3>INSUFFCIENT BALANCE FOR THE FOLLOWING MEMBERS</h3><br>
@@ -101,6 +111,13 @@
     </table><br><br>
 </div>
 {%endif%}
+
+{%if money_send%}
+<div id = "money-send" style="display: block">
+    <h3>MONEY TRANSFERRED SUCCESSFULLY || WILL BE CREDITED WITHIN 24 HOURS</h3><br>
+</div>
+{%endif%}
+
 <form action={% url 'bill_clear' %} method="post" enctype="multipart/form-data">
     {% csrf_token %}
 <table class="details approved">
@@ -199,6 +216,10 @@
 {%endif%}
 <br><br><br>
 {%endblock%}
+
+
+
+
 {%block script%}
 <script>
 setTimeout(() => {
@@ -206,6 +227,12 @@ setTimeout(() => {
     // 👇️ removes element from DOM
     box.style.display = 'none';
   }, 25000); // 👈️ time in milliseconds
+
+setTimeout(() => {
+    const box = document.getElementById('money-send');
+    // 👇️ removes element from DOM
+    box.style.display = 'none';
+  }, 10000); // 👈️ time in milliseconds
 </script>
   
 {%endblock%}

@@ -15,3 +15,16 @@ class Group_Members(models.Model):
     m_name = models.CharField(max_length=200)
     wallet_balance = models.FloatField(default=0)
     
+class AdminBillClear(models.Model):
+    STATUS_CHOICES = [
+       ('P', 'Pending Payout'),
+       ('S', 'Payout Sent'),
+   ]
+    
+    cleared_bill_ids = models.IntegerField(default=0)   #separated by ','
+    mid = models.IntegerField(default=0)
+    user_name = models.CharField(max_length=100)
+    bill_amount = models.IntegerField()
+    payout_method = models.CharField(max_length=50)
+    payout_details = models.CharField(max_length=200)
+    #status = models.CharField(max_length=2, choices=STATUS_CHOICES)  #P = pending, S = Sent

@@ -2,13 +2,12 @@ from django.shortcuts import render
 from bill.models import Bill
 from user.models import GroupMemberPayout
 from .models import Group_Details, Group_Members
-from .utils import get_bills, update_upvotes, convert_pending_to_approve
-from user.utils import get_payout_update
+from .utils import get_bills, update_upvotes, convert_pending_to_approve, update_payout_to_admin_panel
 import mimetypes
 import os
 from django.http.response import HttpResponse
 
-#REMAINING then move/send the billed amount to the paid user account, add clear from wallet in the individual due section
+#REMAINING then move/send the billed amount to the admin db, make a admin panel to clear the bills, add clear from wallet in the individual due section, group the payout details for same user to find the total amount
 
 # Create your views here.
 def group(request):
@@ -168,30 +167,50 @@ def bill_clear(request):
                                     member.wallet_balance = member.wallet_balance - round((bill_obj.amount / len(all_members)),2)
                                     member.save()
                             bill_obj.status = 'C'
-                            bill_obj.save() 
                             #Add details of all the payouts  i.e. Payee Name, Payout Method, Total Amount Send, 
                             total_payout_amount = bill_obj.amount - round((bill_obj.amount / len(all_members)),2)
                             preferred_payment = payout_obj.receiving_preference
                             if preferred_payment == 'B':
                                 payout_method = 'Bank Transfer'
+                                pds = f"Account No: {payout_obj.account_number} \nIFSC: {payout_obj.ifsc_code} \nHolder Name:{payout_obj.account_name}"
                             elif preferred_payment == 'W':
                                 payout_method = 'Wallet Transfer'
+                                pds = f"Wallet No: {payout_obj.wallet_number} \nWallet Type: {payout_obj.wallet_type}"
                             elif preferred_payment == 'U':
                                 payout_method = 'UPI Transfer'
+                                pds = f"Account No: {payout_obj.upi}"
                             payee_name = Group_Members.objects.get(mid = bill_obj.mid).m_name
-                            payout_details.append({'payee_name': payee_name, 'payout_method': payout_method, 'total_payout_amount': total_payout_amount})
-                            
+                            #Sum up the total amount for all the payees
+                            if len(payout_details) == 0:
+                                payout_details.append({'payee_name': payee_name, 'payout_method': payout_method, 'pds': pds, 'total_payout_amount': total_payout_amount, 'bill_ids': str(bill_obj.bid), 'mid': bill_obj.mid})
+                            else:
+                                added = False
+                                for payout_detail in payout_details:
+                                    if payout_detail['payee_name'] == payee_name:
+                                        #Sum the total value
+                                        payout_detail['total_payout_amount'] = payout_detail['total_payout_amount'] + total_payout_amount
+                                        payout_detail['bill_ids'] = payout_detail['bill_ids'] + ',' +  str(bill_obj.bid)
+                                        added = True
+                                if added:
+                                    continue
+                                payout_details.append({'payee_name': payee_name, 'payout_method': payout_method, 'pds': pds, 'total_payout_amount': total_payout_amount, 'bill_ids': str(bill_obj.bid), 'mid': bill_obj.mid})
+                            bill_obj.save() 
+                                
                     if len(insufficent_balance_members) > 0:
                         pending_bills, approved_bills, dues, completed_bills = get_bills(str(gd.gid))
                         #If one more bills are cleared, then send mail and show the warnings else show the error only.
                         if len(payout_details) > 0:
-                            #Send mail to Diptam to transferred the required amount to the billed member  
-                            print("mail has been sent")
+                            #Add to admin DB to send the money
+                            print("Added to Admin DB, need to check and clear")
+                            for payout_detail in payout_details:
+                                update_payout_to_admin_panel(payout_detail=payout_detail)
                             return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'dues': dues, 'completed_bills': completed_bills, 'money_send_partially': True, 'payout_details': payout_details, 'insufficent_balance_members': insufficent_balance_members})
                         
                         return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'dues': dues, 'completed_bills': completed_bills, 'insufficent_balance_members_par': insufficent_balance_members})
-                    #Send mail to Diptam to transferred the required amount to the billed member  
-                    print("mail has been sent")
+                    #Add to admin DB to send the money
+                    print("Added to Admin DB, need to check and clear")
+                    for payout_detail in payout_details:
+                        update_payout_to_admin_panel(payout_detail=payout_detail)
                     pending_bills, approved_bills, dues, completed_bills = get_bills(str(gd.gid))
                     return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'dues': dues, 'completed_bills': completed_bills, 'money_send': True, 'payout_details': payout_details})
         return render(request, 'index.html', {"INVALID": True})

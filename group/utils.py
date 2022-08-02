@@ -1,5 +1,5 @@
 from bill.models import Bill
-from .models import Group_Details, Group_Members
+from .models import Group_Details, Group_Members, AdminBillClear
 
 def get_bills(group_id):
     #Getting pending bills
@@ -55,3 +55,14 @@ def convert_pending_to_approve(group_id):
             # member_obj.wallet_balance = float(member_obj.wallet_balance) - round((bill.amount / len(Group_Members.objects.filter(gid = group_id))),2)
             # member_obj.save()
             bill.save()
+            
+def update_payout_to_admin_panel(payout_detail):
+    send_to_admin = AdminBillClear()
+    send_to_admin.cleared_bill_ids = payout_detail['bill_ids']
+    send_to_admin.mid = payout_detail['mid']
+    send_to_admin.user_name = payout_detail['payee_name']
+    send_to_admin.bill_amount = payout_detail['total_payout_amount']
+    send_to_admin.payout_method = payout_detail['payout_method']
+    send_to_admin.payout_details = payout_detail['pds']
+    send_to_admin.save()
+    print(f"PAYOUT SENT TO ADMIN SUCCESSFULLY FOR {payout_detail['payee_name']}")

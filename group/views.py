@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from bill.models import Bill
+from user.models import GroupMemberPayout
 from .models import Group_Details, Group_Members
 from .utils import get_bills, update_upvotes, convert_pending_to_approve
+from user.utils import get_payout_update
 import mimetypes
 import os
 from django.http.response import HttpResponse
 
-#REMAINING then move/send the billed amount to the paid user account, update the payment send notification in group.html, check if the billed memeber added his/her account number or not before clearing the bill, clear multiple bills together, add/edit payment preferences, add each member/group ewallet, add clear from wallet in the individual due section, add wallet balance to individual members, 
+#REMAINING then move/send the billed amount to the paid user account, add clear from wallet in the individual due section
 
 # Create your views here.
 def group(request):
@@ -85,6 +87,7 @@ def bill_added(request):
                         for chunk in file_path.chunks():
                             destination.write(chunk)
                     #Check if the billed amount / total member is less than the billed by wallet amount
+                    #----------Pending
                     try:
                         if float(amount) > Group_Members.objects.get(mid = billed_by).wallet_balance:
                             pass
@@ -109,7 +112,6 @@ def bill_added(request):
                     bill_obj.gid = gd.gid
                     bill_obj.mid = billed_by
                     bill_obj.save()
-                
                     pending_bills, approved_bills, dues, completed_bills = get_bills(str(gd.gid))
                     return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'dues': dues, 'completed_bills': completed_bills})
         return render(request, 'index.html', {"INVALID": True})
@@ -127,20 +129,38 @@ def bill_clear(request):
             if str(gd.gid) == g_det or gd.g_name == g_det:
                 if gd.g_password == g_password:
                     bill_ids =  request.POST.getlist('billids') 
+                    print(bill_ids)
+                    payout_details = []
+                    insufficent_balance_members = []
                     for bill_id in bill_ids:
                         bill_obj = Bill.objects.get(bid = bill_id)
                         #Check if the billed member added his wallet details or not, otherwise money couldn't be transferred hence throw error
-                        
+                        try:
+                            payout_obj = GroupMemberPayout.objects.get(mid = bill_obj.mid)
+                        except:
+                            payee = Group_Members.objects.get(mid = bill_obj.mid).m_name
+                            pending_bills, approved_bills, dues, completed_bills = get_bills(str(gd.gid))
+                            return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'dues': dues, 'completed_bills': completed_bills, 'money_send_failed': True, 'payee': payee})
                         #Check if shared amount is present everyone's wallet, else return cannot be cleared.
                         all_members = Group_Members.objects.filter(gid = gd.gid)
-                        insufficent_balance_members = []
                         for member in all_members:
-                            if round((bill_obj.amount / len(all_members)),2) > member.wallet_balance:
-                                print(round((bill_obj.amount / len(all_members)),2))
-                                insufficent_balance_members.append({'name': member.m_name, 'need_to_load': (round((bill_obj.amount / len(all_members)),2) - float(member.wallet_balance))})
+                            if bill_obj.mid != member.mid:
+                                if round((bill_obj.amount / len(all_members)),2) > member.wallet_balance:
+                                    print(round((bill_obj.amount / len(all_members)),2))
+                                    if len(insufficent_balance_members) == 0:
+                                        insufficent_balance_members.append({'name': member.m_name, 'need_to_load': (round((bill_obj.amount / len(all_members)),2) - float(member.wallet_balance))})
+                                    else:
+                                        changed = False
+                                        for insufficent_balance_member in insufficent_balance_members:
+                                            if insufficent_balance_member['name'] == member.m_name:
+                                                insufficent_balance_member['need_to_load'] = insufficent_balance_member['need_to_load'] + (round((bill_obj.amount / len(all_members)),2))
+                                                changed = True
+                                        if changed:
+                                            continue
+                                        else:
+                                            insufficent_balance_members.append({'name': member.m_name, 'need_to_load': (round((bill_obj.amount / len(all_members)),2) - float(member.wallet_balance))})
                         if len(insufficent_balance_members) > 0:
-                            pending_bills, approved_bills, dues, completed_bills = get_bills(str(gd.gid))
-                            return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'dues': dues, 'completed_bills': completed_bills, 'insufficent_balance_members': insufficent_balance_members})
+                            continue
                         else:
                             #Now clear the bills  and reduce the shared amount from every payee except the biller
                             for member in all_members:
@@ -149,10 +169,31 @@ def bill_clear(request):
                                     member.save()
                             bill_obj.status = 'C'
                             bill_obj.save() 
+                            #Add details of all the payouts  i.e. Payee Name, Payout Method, Total Amount Send, 
+                            total_payout_amount = bill_obj.amount - round((bill_obj.amount / len(all_members)),2)
+                            preferred_payment = payout_obj.receiving_preference
+                            if preferred_payment == 'B':
+                                payout_method = 'Bank Transfer'
+                            elif preferred_payment == 'W':
+                                payout_method = 'Wallet Transfer'
+                            elif preferred_payment == 'U':
+                                payout_method = 'UPI Transfer'
+                            payee_name = Group_Members.objects.get(mid = bill_obj.mid).m_name
+                            payout_details.append({'payee_name': payee_name, 'payout_method': payout_method, 'total_payout_amount': total_payout_amount})
+                            
+                    if len(insufficent_balance_members) > 0:
+                        pending_bills, approved_bills, dues, completed_bills = get_bills(str(gd.gid))
+                        #If one more bills are cleared, then send mail and show the warnings else show the error only.
+                        if len(payout_details) > 0:
                             #Send mail to Diptam to transferred the required amount to the billed member  
-                                                 
-                            pending_bills, approved_bills, dues, completed_bills = get_bills(str(gd.gid))
-                            return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'dues': dues, 'completed_bills': completed_bills, 'money_send': True})
+                            print("mail has been sent")
+                            return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'dues': dues, 'completed_bills': completed_bills, 'money_send_partially': True, 'payout_details': payout_details, 'insufficent_balance_members': insufficent_balance_members})
+                        
+                        return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'dues': dues, 'completed_bills': completed_bills, 'insufficent_balance_members_par': insufficent_balance_members})
+                    #Send mail to Diptam to transferred the required amount to the billed member  
+                    print("mail has been sent")
+                    pending_bills, approved_bills, dues, completed_bills = get_bills(str(gd.gid))
+                    return render(request, 'group/group.html', {'g_name': g_det, 'g_password': g_password, 'pending_bills': pending_bills, 'approved_bills': approved_bills, 'dues': dues, 'completed_bills': completed_bills, 'money_send': True, 'payout_details': payout_details})
         return render(request, 'index.html', {"INVALID": True})
     else:
         return render(request, 'index.html', {})

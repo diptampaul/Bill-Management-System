@@ -14,3 +14,4 @@ class Group_Members(models.Model):
     gid = models.IntegerField(default=0)
     m_name = models.CharField(max_length=200)
     wallet_balance = models.FloatField(default=0)
+    

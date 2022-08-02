@@ -7,6 +7,12 @@
 <form action={% url 'home' %} method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="submit" name="submit" class='submit' value='HOME' >
+</form>
+<form action={% url 'group' %} method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="text" id="g_det" name="g_det" value="{{g_name}}" style="display: None;">
+    <input type="password" id="g_password" name="g_password" value="{{g_password}}" style="display: None;">
+    <input type="submit" name="submit" class='submit' value='REFRESH BILLS' style="width: 150px !important">
 </form><br>
     <br><br><br>
 
@@ -91,7 +97,6 @@
 
 
 
-{%if approved_bills|length%}
 <br><br><br><h1>Approved Bills</h1><br>
 
 {%if insufficent_balance_members%}
@@ -112,11 +117,66 @@
 </div>
 {%endif%}
 
+{%if money_send_partially%}
+<div id = "money-send-partially" style="display: block">
+    <h3>MONEY TRANSFERRED SUCCESSFULLY || WILL BE CREDITED WITHIN 24 HOURS</h3><br>
+    <table class="details transferred">
+        <tr>
+          <th> NAME </th>
+          <th> PAYOUT METHOD </th>
+          <th> PAYOUT AMOUNT </th>
+        </tr>
+        {%for payout_detail in payout_details%}
+        <tr>
+            <td>{{payout_detail.payee_name}}</td>
+            <td>{{payout_detail.payout_method}}</td>
+            <td>{{payout_detail.total_payout_amount}}</td>
+        </tr>
+        {%endfor%}
+    </table><br>
+    <h3>INSUFFCIENT BALANCE FOR THE FOLLOWING MEMBERS</h3><br>
+    <table class="details dues">
+        <tr>
+        <th> NAME </th>
+        <th> NEED TO TOPUP </th>
+        </tr>
+        {%for ibmember in insufficent_balance_members_par%}
+        <tr>
+            <td>{{ibmember.name}}</td>
+            <td>{{ibmember.need_to_load}}</td>
+        </tr>
+        {%endfor%}
+    </table><br><br>
+</div>
+{%endif%}
+
 {%if money_send%}
 <div id = "money-send" style="display: block">
     <h3>MONEY TRANSFERRED SUCCESSFULLY || WILL BE CREDITED WITHIN 24 HOURS</h3><br>
+    <table class="details transferred-success">
+        <tr>
+          <th> NAME </th>
+          <th> PAYOUT METHOD </th>
+          <th> PAYOUT AMOUNT </th>
+        </tr>
+        {%for payout_detail in payout_details%}
+        <tr>
+            <td>{{payout_detail.payee_name}}</td>
+            <td>{{payout_detail.payout_method}}</td>
+            <td>{{payout_detail.total_payout_amount}}</td>
+        </tr>
+        {%endfor%}
+      </table><br>
 </div>
 {%endif%}
+
+{%if money_send_failed%}
+<div id = "money-send-failed" style="display: block">
+    <h3>MONEY TRANSFERRED FAILED || {{payee}} hasn't added any PAYOUT method yet.</h3><br>
+</div>
+{%endif%}
+
+{%if approved_bills|length%}
 
 <form action={% url 'bill_clear' %} method="post" enctype="multipart/form-data">
     {% csrf_token %}
@@ -141,7 +201,7 @@
         <td>{{bill.created_at}}</td>
         <td>
             <div>
-                <input type="radio" id="billids" name="billids" value="{{bill.id}}">
+                <input type="checkbox" id="billids" name="billids" value="{{bill.id}}">
                 <label for="billids"> CLEAR</label><br>
             </div>
         </td>
@@ -153,7 +213,6 @@
   <input type="submit" name="submit" class='submit' value='submit' >
 </form><br>
 {%else%}
-<h1>Approved Bills </h1><br>
 <h3>---- All Cleared | Enjoy !!! ----</h3>
 {%endif%}
 
@@ -179,10 +238,10 @@
         <td>{{due.wallet}}</td>
     </tr>
     {%endfor%}
-  </table><br>
+  </table><br><br>
 {%else%}
 <h1>Individual Dues </h1><br>
-<h3>---- All Cleared | Enjoy !!! ----</h3>
+<h3>---- All Cleared | Enjoy !!! ----</h3><br><br>
 {%endif%}
 
 
@@ -233,6 +292,18 @@ setTimeout(() => {
     // 👇️ removes element from DOM
     box.style.display = 'none';
   }, 10000); // 👈️ time in milliseconds
+
+setTimeout(() => {
+    const box = document.getElementById('money-send-failed');
+    // 👇️ removes element from DOM
+    box.style.display = 'none';
+  }, 10000); // 👈️ time in milliseconds
+
+setTimeout(() => {
+    const box = document.getElementById('money-send-partially');
+    // 👇️ removes element from DOM
+    box.style.display = 'none';
+  }, 25000); // 👈️ time in milliseconds
 </script>
   
 {%endblock%}

@@ -36,7 +36,7 @@ def get_bills(group_id):
     
     modified_due_list = []
     for member in due_list:
-        modified_due_list.append({'name': member[1], 'amount': round(member[3],2), 'id' : member[0], 'wallet': member[2]})
+        modified_due_list.append({'name': member[1], 'amount': round(member[3],2), 'id' : member[0], 'wallet': member[2], 'size': len(due_list)})
         
     return pending_bills, approved_bills, modified_due_list, completed_bills
 

@@ -3,7 +3,7 @@
 
 {%block content%}
 
-<h1> Hi {{g_name}} !!</h1> 
+<h1> Hi {{g_name}} {{payment_failed}} !!</h1> 
 <form action={% url 'home' %} method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <input type="submit" name="submit" class='submit' value='HOME' >
@@ -220,27 +220,56 @@
 
 
 
+<br><br><br><h1>Individual Dues</h1><br>
+{%if payment_failed%}
+<div id = "payment-failed" style="display: block">
+    <h3>Payment Failed. Retry with correct data.</h3><br>
+</div>
+{%endif%}
 
+{%if payment_success%}
+<div id = "payment-success" style="display: block">
+    <h3>SUCCESS !! {{topup_amount}} has been added to the wallet</h3><br>
+</div>
+{%endif%}
 
 {%if dues|length%}
-<br><br><br><h1>Individual Dues</h1><br>
+<form action={% url 'top_up_wallet' %} method="post" enctype="multipart/form-data">
+    {% csrf_token %}
 <table class="details dues">
     <tr>
       <th> NAME </th>
       <th> TOTAL PENDING </th>
       <th> WALLET BALANCE </th>
       <th> TOPUP WALLET </th>
+      <th> TOPUP AMOUNT </th>
     </tr>
     {%for due in dues%}
     <tr>
         <td>{{due.name}}</td>
         <td>{{due.amount}}</td>
         <td>{{due.wallet}}</td>
+        <td>
+            <div>
+                <input type="radio" id="member_id" name="member_id" value="{{due.id}}">
+                <label for="member_id"> SELECT</label><br>
+            </div>
+        </td>
+        {% if forloop.counter == 1 %}
+        <td rowspan="{{due.size}}">
+            <div>
+                <input type="number" id="amount" name="amount" placeholder="Enter Amount" required>
+            </div>
+        </td>
+        {%endif%}
     </tr>
     {%endfor%}
-  </table><br><br>
+  </table>
+  <input type="text" id="g_det" name="g_det" value="{{g_name}}" style="display: None;">
+  <input type="password" id="g_password" name="g_password" value="{{g_password}}" style="display: None;">
+  <input type="submit" name="submit" class='submit' value='TOP UP' >
+</form><br><br>
 {%else%}
-<h1>Individual Dues </h1><br>
 <h3>---- All Cleared | Enjoy !!! ----</h3><br><br>
 {%endif%}
 
@@ -301,6 +330,18 @@ setTimeout(() => {
 
 setTimeout(() => {
     const box = document.getElementById('money-send-partially');
+    // 👇️ removes element from DOM
+    box.style.display = 'none';
+  }, 25000); // 👈️ time in milliseconds
+
+setTimeout(() => {
+    const box = document.getElementById('payment-failed');
+    // 👇️ removes element from DOM
+    box.style.display = 'none';
+  }, 25000); // 👈️ time in milliseconds
+
+setTimeout(() => {
+    const box = document.getElementById('payment-success');
     // 👇️ removes element from DOM
     box.style.display = 'none';
   }, 25000); // 👈️ time in milliseconds

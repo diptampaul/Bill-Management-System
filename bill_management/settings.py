@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'user',
     'group',
     'bill',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -153,3 +154,8 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 
 # Custom setting. To email
 RECIPIENT_ADDRESS = env('RECIPIENT_ADDRESS')
+
+
+#Razorpay Details
+RAZOR_KEY_ID = env('RAZORPAY_KEY_ID')
+RAZOR_KEY_SECRET = env('RAZORPAY_KEY_SECRET')

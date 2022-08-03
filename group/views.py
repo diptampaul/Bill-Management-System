@@ -7,8 +7,6 @@ import mimetypes
 import os
 from django.http.response import HttpResponse
 
-#REMAINING then move/send the billed amount to the admin db, make a admin panel to clear the bills, add clear from wallet in the individual due section, group the payout details for same user to find the total amount
-
 # Create your views here.
 def group(request):
     if request.method == 'POST':
@@ -216,11 +214,6 @@ def bill_clear(request):
         return render(request, 'index.html', {"INVALID": True})
     else:
         return render(request, 'index.html', {})
-    
-    
-    
-    
-    
     
 def bills_download(request, filename=''):
     if filename != '':

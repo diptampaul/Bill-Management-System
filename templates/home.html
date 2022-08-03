@@ -101,9 +101,10 @@
     </div>
 
 
-
+    {%block script%}{%endblock%}
 
     <script>
+        console.log("javascript Loaded Main")
         //answers
 //const greetings = ['Hello Mate', 'How are you doing today?', "What's Up homeboi"]
 
@@ -130,7 +131,5 @@ group_cls.addEventListener('click',function(e){
     group_content.style.display = 'none';
 })
     </script>
-
-    {%block script%}{%endblock%}
 </body>
 </html>

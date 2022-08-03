@@ -1,0 +1,98 @@
+{% extends '../home.html' %}
+{%load static%}
+
+{%block css%}
+<style>
+    .btn_container {
+        padding: 20px;
+        text-align: center;
+    }
+    .btn {
+        border-radius: 4px;
+        cursor: pointer;
+        padding: 4px 8px;
+        background-color: #ffaaa7;
+        color: white;
+        font-size: 1.2em;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+</style>
+{%endblock%}
+
+
+
+{%block content%}
+<h1> Hi {{g_name}} !!</h1> 
+<form action={% url 'home' %} method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="submit" name="submit" class='submit' value='HOME' >
+</form>
+<form action={% url 'group' %} method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="text" id="g_det" name="g_det" value="{{g_name}}" style="display: None;">
+    <input type="password" id="g_password" name="g_password" value="{{g_password}}" style="display: None;">
+    <input type="submit" name="submit" class='submit' value='REFRESH BILLS' style="width: 150px !important">
+</form><br>
+    <br><br><br>
+
+<h1>CONFIRM WALLET TOPUP</h1><br>
+<table class="details completed">
+    <tr>
+        <th> NAME </th>
+        <th> WALLET BALANCE </th>
+        <th> TOPUP AMOUNT </th>
+    </tr>
+    <tr>
+        <td>{{member_details.m_name}}</td>
+        <td>{{member_details.wallet_balance}}</td>
+        <td>
+            {{amount}}
+        </td>
+    </tr>
+</table>
+<div class="btn_container">
+    <!-- Payment Button -->
+    <button class="btn" id="pay-btn">PROCEED PAYMENT</button>
+</div>
+{%endblock%}
+
+
+{%block script%}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.getElementById("pay-btn").addEventListener("click", (e)=>{
+        //rzp1.open();
+        console.log("BUTTON PRESSED");
+        
+        var options = {
+       
+            // Enter the Key ID generated from the Dashboard
+            key: "{{ context.razorpay_merchant_key }}",
+             
+            // Amount is in currency subunits.
+            // Default currency is INR. Hence,
+            // 50000 refers to 50000 paise/ 500 rupees
+            amount: "{{ context.razorpay_amount }}",
+            currency: "{{ context.currency }}",
+             
+            // Your/store name.
+            name: "Diptam Bill Management System",
+      
+            order_id: "{{ context.razorpay_order_id }}",
+            callback_url: "{{ context.callback_url }}",
+            
+            // Some more datas
+            member_id: "{{member_details.mid}}",
+            g_det: "{{g_name}}",
+            g_password: "{{g_password}}",
+            
+        };
+
+        // initialise razorpay with the options.
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+        e.preventDefault();
+      });
+</script>
+{%endblock%}

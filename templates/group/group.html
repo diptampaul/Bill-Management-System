@@ -256,7 +256,7 @@
             </div>
         </td>
         {% if forloop.counter == 1 %}
-        <td rowspan="{{due.size}}">
+        <td rowspan="{{due.size}}" style="height: 100%;">
             <div>
                 <input type="number" id="amount" name="amount" placeholder="Enter Amount" required>
             </div>
@@ -302,6 +302,7 @@
 <h1>Completed Bills </h1><br>
 <h3>---- Empty ----</h3>
 {%endif%}
+
 <br><br><br>
 {%endblock%}
 
@@ -309,42 +310,6 @@
 
 
 {%block script%}
-<script>
-setTimeout(() => {
-    const box = document.getElementById('ins-balance');
-    // 👇️ removes element from DOM
-    box.style.display = 'none';
-  }, 25000); // 👈️ time in milliseconds
-
-setTimeout(() => {
-    const box = document.getElementById('money-send');
-    // 👇️ removes element from DOM
-    box.style.display = 'none';
-  }, 20000); // 👈️ time in milliseconds
-
-setTimeout(() => {
-    const box = document.getElementById('money-send-failed');
-    // 👇️ removes element from DOM
-    box.style.display = 'none';
-  }, 15000); // 👈️ time in milliseconds
-
-setTimeout(() => {
-    const box = document.getElementById('money-send-partially');
-    // 👇️ removes element from DOM
-    box.style.display = 'none';
-  }, 25000); // 👈️ time in milliseconds
-
-setTimeout(() => {
-    const box = document.getElementById('payment-failed');
-    // 👇️ removes element from DOM
-    box.style.display = 'none';
-  }, 25000); // 👈️ time in milliseconds
-
-setTimeout(() => {
-    const box = document.getElementById('payment-success');
-    // 👇️ removes element from DOM
-    box.style.display = 'none';
-  }, 25000); // 👈️ time in milliseconds
-</script>
+<script src="{% static 'group.js' %}"></script>
   
 {%endblock%}

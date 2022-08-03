@@ -7,6 +7,8 @@ import mimetypes
 import os
 from django.http.response import HttpResponse
 
+#REMAINING TASKS : Add a delete option for the pending and approved bills
+
 # Create your views here.
 def group(request):
     if request.method == 'POST':

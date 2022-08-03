@@ -24,6 +24,8 @@ def top_up_wallet(request):
                     except:
                         return HttpResponseBadRequest()
                     amount = request.POST['amount']
+                    if amount < 10:
+                        return HttpResponseBadRequest()
                     member_details = Group_Members.objects.get(mid = member_id)
                     context = razorpay_initial_object(razorpay_client, float(str(amount)+"00"))
                     #Store into payment initialized table
